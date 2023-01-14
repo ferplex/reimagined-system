@@ -1,3 +1,4 @@
 # reimagined-system
 Clásicos vídeo juegos 
-https://drive.google.com/drive/folders/1N2h-uqYOUZ5w2yZPwpn9iGnHqW__cdxT?usp=sharing
+Ps2 emulation
+https://drive.google.com/file/d/1GUgXzCiLO9cAewsXOfud4AlSkZkrgXQd/view?usp=share_link
