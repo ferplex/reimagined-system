@@ -1,0 +1,122 @@
+import sys
+import os
+import random
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
+                             QHBoxLayout, QWidget, QPushButton, QLabel, QMessageBox)
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import QUrl, QTimer, Qt
+
+# --- CONFIGURACIÓN DE CLIENTE (PARA EL MANUAL) ---
+# El usuario debe reemplazar estas variables con sus propias llaves de Binance
+BINANCE_API_KEY = "PONER_AQUÍ_API_KEY_CLIENTE"
+BINANCE_SECRET_KEY = "PONER_AQUÍ_SECRET_KEY_CLIENTE"
+
+class AthenaDeluxe(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("ATHENA-AXON-DEMO | FERPLEX CORPORATE")
+        self.setGeometry(100, 100, 1280, 720)
+        self.precio_base = 0.5245
+        self.init_ui()
+
+    def init_ui(self):
+        main_layout = QHBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # --- PANEL LATERAL ---
+        side_panel = QVBoxLayout()
+        container_side = QWidget()
+        container_side.setStyleSheet("background-color: #000000; border-right: 2px solid #ff00ff;")
+        container_side.setFixedWidth(320)
+        
+        self.label_titulo = QLabel("🛡️ ATHENA-AXON\nSAFE MODE ACTIVE")
+        self.label_titulo.setStyleSheet("color: #ff00ff; font-weight: bold; font-size: 20px; padding: 20px;")
+        self.label_titulo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self.label_precio = QLabel(f"POL/USDT\n${self.precio_base}")
+        self.label_precio.setStyleSheet("color: #00ff00; font-size: 28px; font-family: monospace; background: #111; border: 1px solid #00ff00; border-radius: 5px; padding: 15px;")
+        self.label_precio.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        btn_apoyo = QPushButton("⚡ APOYO PARA LA LUZ")
+        btn_apoyo.setStyleSheet("background-color: #ff8c00; color: black; font-weight: bold; font-size: 16px; border-radius: 10px; height: 60px; margin: 20px;")
+        btn_apoyo.clicked.connect(self.mostrar_qr)
+        
+        side_panel.addWidget(self.label_titulo)
+        side_panel.addSpacing(20)
+        side_panel.addWidget(self.label_precio)
+        side_panel.addStretch()
+        side_panel.addWidget(btn_apoyo)
+        container_side.setLayout(side_panel)
+
+        # --- PANEL DERECHO ---
+        self.browser = QWebEngineView()
+        self.browser.setUrl(QUrl("https://www.google.com")) 
+        
+        main_layout.addWidget(container_side)
+        main_layout.addWidget(self.browser)
+        
+        central_widget = QWidget()
+        central_widget.setLayout(main_layout)
+        self.setCentralWidget(central_widget)
+        
+        # Timers
+        self.timer_mercado = QTimer()
+        self.timer_mercado.timeout.connect(self.actualizar_mercado)
+        self.timer_mercado.start(2000)
+
+    def actualizar_mercado(self):
+        variacion = random.uniform(-0.001, 0.001)
+        self.precio_base += variacion
+        self.label_precio.setText(f"POL/USDT\n${self.precio_base:.4f}")
+
+    def mostrar_qr(self):
+        # INTENTO DE RUTA 1: Absoluta
+        ruta_qr = "/home/luis/reimagined-system/qr_pago.png"
+        
+        # Si no la encuentra, intenta ruta relativa al script
+        if not os.path.exists(ruta_qr):
+            ruta_qr = os.path.join(os.path.dirname(__file__), "qr_pago.png")
+
+        if os.path.exists(ruta_qr):
+            print(f"[OK] Cargando QR: {ruta_qr}")
+            # Usamos QUrl.fromLocalFile para asegurar compatibilidad con Linux
+            self.browser.setHtml(f"<html><body style='background:black; display:flex; justify-content:center; align-items:center;'><img src='file://{ruta_qr}' style='max-width:90%; border:5px solid #ff00ff;'></body></html>")
+        else:
+            print(f"[!] ERROR: Imagen no encontrada en {ruta_qr}")
+            self.browser.setUrl(QUrl("https://www.coingecko.com/en/coins/polygon"))
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = AthenaDeluxe()
+    window.show()
+    sys.exit(app.exec())
+    
+    def mostrar_qr(self):
+        import base64
+        ruta_foto = "/home/luis/reimagined-system/qr_pago.png"
+        
+        if os.path.exists(ruta_foto):
+            with open(ruta_foto, "rb") as f:
+                # Convertimos la imagen a texto para que el navegador no pueda bloquearla
+                encoded_string = base64.b64encode(f.read()).decode()
+            
+            print(f"[OK] Desplegando Blindaje Maestro...")
+            html_content = f"""
+            <html>
+            <body style="background-color:black; margin:0; display:flex; justify-content:center; align-items:center; height:100vh;">
+                <img src="data:image/png;base64,{encoded_string}" 
+                     style="max-width:85%; border:5px solid #ff00ff; border-radius:15px; box-shadow: 0 0 20px #ff00ff;">
+            </body>
+            </html>
+            """
+            self.browser.setHtml(html_content)
+        else:
+            print(f"[!] Error: No se encuentra en {ruta_foto}")
+            self.browser.setUrl(QUrl("https://www.google.com"))
+    
+    
+    Instrucciones para el Manual: Dile al cliente que debe crear un archivo llamado .env o poner sus llaves donde dice TU_API_KEY.
+    
+    
+    "Security Note: This software uses standard environment variables for Binance API connectivity. Ensure you provide your own API_KEY and SECRET_KEY in the configuration section. Never share your .env file or hardcode keys into the script."
